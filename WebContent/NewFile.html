@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<script>
+		var socket = null;
+		
+		function init(){
+			webSocketConnection();
+		}
+
+		function webSocketConnection(){
+			var url = "ws://echo.websocket.org/";
+			console.log("connection Initilized");
+			
+			try{
+				socket = new WebSocket (url);
+				
+				socket.onopen = function(openEvent){
+					console.log("connection opened" + JSON.stringify(openEvent));
+					var label = document.getElementById("status");
+					label.innerHTML = "connection established";
+					onSend("Web socket rocks");
+				}
+				
+				socket.onmessage = function(msgEvnt){
+					console.log("message recieved");
+					var msg = msgEvent.data;
+					var strmsg = JSON.parse(msg);
+					
+					document.getElementById("msgBox").textContent(msg);
+					
+				}
+				
+				socket.onclose = function (event){
+					console.log("connection closed"+ JSON.stringify(event));
+					
+					if (event.code != 1000){
+						if(!navigator.onLine){
+							alert("you are ofline connected to the internet");
+						}
+						else{
+							var label = document.getElementById("status");
+							label.innerHTML="error" + JSON.stringify(event);
+						}
+					}
+				}
+				
+				socket.onerror = function (event){
+					console.log("WebsSocketError" + JOSN.stringify(event));
+				}
+				
+				
+				
+			}catch(exception){
+				console.error (exception);
+				alert(exception);
+				
+			}	
+		}
+		
+		function onSend(message){
+			var sent = document.getElementById("sent");
+			sent.innerHTML = "sent : "+message;
+			socket.send(message);			
+		}
+		
+		function closeConnection(){
+			if (socket.readyState === WebSocket.OPEN){
+				socket.close(100,"deliberate disconnection");
+						
+			}
+			
+		}
+		
+		window.addEventListener("load", init, false)
+</script>
+</head>
+<body >
+		<h1>hello</h1><h id ="status"></h>
+		<p id="msgBox"></p>
+		<p id ="sent"></p>
+		<button onClick= "closeConnection()"></button>
+		
+</body>
+</html>
